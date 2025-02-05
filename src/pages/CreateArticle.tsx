@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Navigate } from "react-router-dom";
-import { Plus, X } from "lucide-react";
+import { Plus, X, Image as ImageIcon } from "lucide-react";
 
 export default function CreateArticle() {
   const [title, setTitle] = useState("");
@@ -16,6 +16,8 @@ export default function CreateArticle() {
   const [isLoading, setIsLoading] = useState(false);
   const [relatedStocks, setRelatedStocks] = useState<string[]>([]);
   const [newStock, setNewStock] = useState("");
+  const contentRef = useRef<HTMLTextAreaElement>(null);
+  const inlineImageInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const { user, isAdmin } = useAuth();
 
@@ -26,6 +28,46 @@ export default function CreateArticle() {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setImage(e.target.files[0]);
+    }
+  };
+
+  const handleInlineImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || !e.target.files[0]) return;
+    
+    const file = e.target.files[0];
+    const fileExt = file.name.split('.').pop();
+    const filePath = `${crypto.randomUUID()}.${fileExt}`;
+    
+    try {
+      const { error: uploadError } = await supabase.storage
+        .from('article-images')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('article-images')
+        .getPublicUrl(filePath);
+
+      // Insert image URL at cursor position
+      const textarea = contentRef.current;
+      if (textarea) {
+        const cursorPosition = textarea.selectionStart;
+        const textBefore = content.substring(0, cursorPosition);
+        const textAfter = content.substring(cursorPosition);
+        const imageMarkdown = `\n![Article image](${publicUrl})\n`;
+        
+        setContent(textBefore + imageMarkdown + textAfter);
+        
+        // Reset file input
+        if (inlineImageInputRef.current) {
+          inlineImageInputRef.current.value = '';
+        }
+      }
+
+      toast.success("Image uploaded successfully!");
+    } catch (error: any) {
+      toast.error("Failed to upload image: " + error.message);
     }
   };
 
@@ -115,16 +157,35 @@ export default function CreateArticle() {
         </div>
         <div>
           <label className="block text-sm font-medium mb-2">Content</label>
-          <Textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            required
-            placeholder="Write your article content"
-            className="min-h-[200px]"
-          />
+          <div className="relative">
+            <Textarea
+              ref={contentRef}
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              required
+              placeholder="Write your article content"
+              className="min-h-[200px]"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              className="absolute right-2 bottom-2"
+              onClick={() => inlineImageInputRef.current?.click()}
+            >
+              <ImageIcon className="h-4 w-4" />
+            </Button>
+            <input
+              ref={inlineImageInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleInlineImageUpload}
+              className="hidden"
+            />
+          </div>
         </div>
         <div>
-          <label className="block text-sm font-medium mb-2">Image</label>
+          <label className="block text-sm font-medium mb-2">Hero Image</label>
           <Input
             type="file"
             accept="image/*"
@@ -169,4 +230,4 @@ export default function CreateArticle() {
       </form>
     </div>
   );
-};
+}

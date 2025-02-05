@@ -9,6 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
+import ReactMarkdown from 'react-markdown';
 
 const Article = () => {
   const { id } = useParams();
@@ -147,9 +148,9 @@ const Article = () => {
               className="min-h-[400px]"
             />
           ) : (
-            <p className="text-lg leading-relaxed whitespace-pre-line">
+            <ReactMarkdown className="text-lg leading-relaxed">
               {article.content}
-            </p>
+            </ReactMarkdown>
           )}
           <div className="mt-8 flex items-center gap-4">
             {canEdit && (
