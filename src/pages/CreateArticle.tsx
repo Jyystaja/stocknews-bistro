@@ -18,6 +18,7 @@ export default function CreateArticle() {
   const [newStock, setNewStock] = useState("");
   const contentRef = useRef<HTMLTextAreaElement>(null);
   const inlineImageInputRef = useRef<HTMLInputElement>(null);
+  const heroImageInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const { user, isAdmin } = useAuth();
 
@@ -39,6 +40,7 @@ export default function CreateArticle() {
     const filePath = `${crypto.randomUUID()}.${fileExt}`;
     
     try {
+      setIsLoading(true);
       const { error: uploadError } = await supabase.storage
         .from('article-images')
         .upload(filePath, file);
@@ -55,7 +57,7 @@ export default function CreateArticle() {
         const cursorPosition = textarea.selectionStart;
         const textBefore = content.substring(0, cursorPosition);
         const textAfter = content.substring(cursorPosition);
-        const imageMarkdown = `\n![Article image](${publicUrl})\n`;
+        const imageMarkdown = `\n![${file.name}](${publicUrl})\n`;
         
         setContent(textBefore + imageMarkdown + textAfter);
         
@@ -68,6 +70,8 @@ export default function CreateArticle() {
       toast.success("Image uploaded successfully!");
     } catch (error: any) {
       toast.error("Failed to upload image: " + error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -172,6 +176,7 @@ export default function CreateArticle() {
               size="icon"
               className="absolute right-2 bottom-2"
               onClick={() => inlineImageInputRef.current?.click()}
+              disabled={isLoading}
             >
               <ImageIcon className="h-4 w-4" />
             </Button>
@@ -191,6 +196,7 @@ export default function CreateArticle() {
             accept="image/*"
             onChange={handleImageChange}
             className="cursor-pointer"
+            ref={heroImageInputRef}
           />
         </div>
         <div>

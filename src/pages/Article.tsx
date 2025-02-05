@@ -140,7 +140,7 @@ const Article = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8">
-        <div className="prose max-w-none">
+        <div className="prose prose-lg max-w-none dark:prose-invert">
           {isEditing ? (
             <Textarea
               value={editedContent}
@@ -148,7 +148,17 @@ const Article = () => {
               className="min-h-[400px]"
             />
           ) : (
-            <ReactMarkdown className="text-lg leading-relaxed">
+            <ReactMarkdown 
+              components={{
+                img: ({ node, ...props }) => (
+                  <img 
+                    {...props} 
+                    className="w-full rounded-lg my-4"
+                    loading="lazy"
+                  />
+                ),
+              }}
+            >
               {article.content}
             </ReactMarkdown>
           )}
