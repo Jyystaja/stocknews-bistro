@@ -7,12 +7,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Navigate } from "react-router-dom";
+import { Plus, X } from "lucide-react";
 
 export default function CreateArticle() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [relatedStocks, setRelatedStocks] = useState<string[]>([]);
+  const [newStock, setNewStock] = useState("");
   const navigate = useNavigate();
   const { user, isAdmin } = useAuth();
 
@@ -24,6 +27,17 @@ export default function CreateArticle() {
     if (e.target.files && e.target.files[0]) {
       setImage(e.target.files[0]);
     }
+  };
+
+  const addStock = () => {
+    if (newStock && !relatedStocks.includes(newStock.toUpperCase())) {
+      setRelatedStocks([...relatedStocks, newStock.toUpperCase()]);
+      setNewStock("");
+    }
+  };
+
+  const removeStock = (stock: string) => {
+    setRelatedStocks(relatedStocks.filter((s) => s !== stock));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -51,19 +65,34 @@ export default function CreateArticle() {
         imageUrl = publicUrl;
       }
 
-      const { error } = await supabase
+      const { data: article, error: articleError } = await supabase
         .from('articles')
         .insert({
           title,
           content,
           image_url: imageUrl,
           author_id: user.id,
-        });
+        })
+        .select()
+        .single();
 
-      if (error) throw error;
+      if (articleError) throw articleError;
+
+      if (relatedStocks.length > 0) {
+        const { error: stocksError } = await supabase
+          .from('article_stocks')
+          .insert(
+            relatedStocks.map(symbol => ({
+              article_id: article.id,
+              symbol,
+            }))
+          );
+
+        if (stocksError) throw stocksError;
+      }
 
       toast.success("Article created successfully!");
-      navigate("/");
+      navigate(`/article/${article.id}`);
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -103,10 +132,41 @@ export default function CreateArticle() {
             className="cursor-pointer"
           />
         </div>
+        <div>
+          <label className="block text-sm font-medium mb-2">Related Stocks</label>
+          <div className="flex gap-2">
+            <Input
+              value={newStock}
+              onChange={(e) => setNewStock(e.target.value.toUpperCase())}
+              placeholder="Enter stock symbol (e.g., AAPL)"
+              className="flex-1"
+            />
+            <Button type="button" onClick={addStock} variant="outline">
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {relatedStocks.map((stock) => (
+              <div
+                key={stock}
+                className="flex items-center gap-1 bg-accent px-2 py-1 rounded"
+              >
+                <span>{stock}</span>
+                <button
+                  type="button"
+                  onClick={() => removeStock(stock)}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
         <Button type="submit" disabled={isLoading}>
           {isLoading ? "Creating..." : "Create Article"}
         </Button>
       </form>
     </div>
   );
-}
+};
