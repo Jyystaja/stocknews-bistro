@@ -8,8 +8,7 @@ import { Navigate } from "react-router-dom";
 export default function Auth() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isSignUp, setIsSignUp] = useState(false);
-  const { signIn, signUp, session } = useAuth();
+  const { signIn, session } = useAuth();
 
   if (session) {
     return <Navigate to="/" replace />;
@@ -17,22 +16,16 @@ export default function Auth() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isSignUp) {
-      await signUp(email, password);
-    } else {
-      await signIn(email, password);
-    }
+    await signIn(email, password);
   };
 
   return (
     <div className="flex min-h-[80vh] items-center justify-center">
       <Card className="w-[400px]">
         <CardHeader>
-          <CardTitle>{isSignUp ? "Create an account" : "Welcome back"}</CardTitle>
+          <CardTitle>Admin Login</CardTitle>
           <CardDescription>
-            {isSignUp
-              ? "Enter your email below to create your account"
-              : "Enter your email below to sign in to your account"}
+            Enter your credentials to access the admin panel
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -56,17 +49,7 @@ export default function Auth() {
               />
             </div>
             <Button type="submit" className="w-full">
-              {isSignUp ? "Sign Up" : "Sign In"}
-            </Button>
-            <Button
-              type="button"
-              variant="link"
-              className="w-full"
-              onClick={() => setIsSignUp(!isSignUp)}
-            >
-              {isSignUp
-                ? "Already have an account? Sign In"
-                : "Don't have an account? Sign Up"}
+              Sign In
             </Button>
           </form>
         </CardContent>

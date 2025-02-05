@@ -1,14 +1,23 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Share2, ArrowUp, ArrowDown } from "lucide-react";
+import { Share2, ArrowUp, ArrowDown, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 
 const Article = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [stockPrices, setStockPrices] = useState<Record<string, { price: string; change: string }>>({});
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedTitle, setEditedTitle] = useState("");
+  const [editedContent, setEditedContent] = useState("");
 
   const { data: article, isLoading } = useQuery({
     queryKey: ["article", id],
@@ -28,6 +37,34 @@ const Article = () => {
       return article;
     },
   });
+
+  const updateArticleMutation = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from("articles")
+        .update({
+          title: editedTitle,
+          content: editedContent,
+        })
+        .eq("id", id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Article updated successfully!");
+      setIsEditing(false);
+    },
+    onError: (error) => {
+      toast.error("Failed to update article: " + error.message);
+    },
+  });
+
+  useEffect(() => {
+    if (article) {
+      setEditedTitle(article.title);
+      setEditedContent(article.content);
+    }
+  }, [article]);
 
   useEffect(() => {
     const fetchStockPrices = async () => {
@@ -56,7 +93,7 @@ const Article = () => {
     };
 
     fetchStockPrices();
-    const interval = setInterval(fetchStockPrices, 60000); // Update every minute
+    const interval = setInterval(fetchStockPrices, 60000);
     return () => clearInterval(interval);
   }, [article]);
 
@@ -67,6 +104,12 @@ const Article = () => {
   if (!article) {
     return <div>Article not found</div>;
   }
+
+  const canEdit = user && article.author_id === user.id;
+
+  const handleSave = () => {
+    updateArticleMutation.mutate();
+  };
 
   return (
     <div className="max-w-4xl mx-auto animate-fade-in">
@@ -80,7 +123,15 @@ const Article = () => {
           />
         )}
         <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
-          <h1 className="text-4xl font-bold mb-4">{article.title}</h1>
+          {isEditing ? (
+            <Input
+              value={editedTitle}
+              onChange={(e) => setEditedTitle(e.target.value)}
+              className="text-4xl font-bold mb-4 bg-white/10 border-white/20"
+            />
+          ) : (
+            <h1 className="text-4xl font-bold mb-4">{article.title}</h1>
+          )}
           <div className="flex items-center gap-4">
             <span>{new Date(article.created_at).toLocaleDateString()}</span>
           </div>
@@ -89,10 +140,31 @@ const Article = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8">
         <div className="prose max-w-none">
-          <p className="text-lg leading-relaxed whitespace-pre-line">
-            {article.content}
-          </p>
+          {isEditing ? (
+            <Textarea
+              value={editedContent}
+              onChange={(e) => setEditedContent(e.target.value)}
+              className="min-h-[400px]"
+            />
+          ) : (
+            <p className="text-lg leading-relaxed whitespace-pre-line">
+              {article.content}
+            </p>
+          )}
           <div className="mt-8 flex items-center gap-4">
+            {canEdit && (
+              isEditing ? (
+                <>
+                  <Button onClick={handleSave}>Save</Button>
+                  <Button variant="outline" onClick={() => setIsEditing(false)}>Cancel</Button>
+                </>
+              ) : (
+                <Button variant="outline" onClick={() => setIsEditing(true)}>
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit
+                </Button>
+              )
+            )}
             <Button variant="outline" size="sm">
               <Share2 className="h-4 w-4 mr-2" />
               Share
