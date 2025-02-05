@@ -35,24 +35,14 @@ const Article = () => {
 
       try {
         const symbols = article.article_stocks.map((stock: { symbol: string }) => stock.symbol);
-        const response = await fetch(
-          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-stock-prices`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-            },
-            body: JSON.stringify({ symbols }),
-          }
-        );
+        const { data, error } = await supabase.functions.invoke('get-stock-prices', {
+          body: { symbols }
+        });
 
-        if (!response.ok) throw new Error('Failed to fetch stock prices');
+        if (error) throw error;
 
-        const prices = await response.json();
         const pricesMap: Record<string, { price: string; change: string }> = {};
-        
-        prices.forEach((price: { symbol: string; price: string; change: string }) => {
+        data.forEach((price: { symbol: string; price: string; change: string }) => {
           pricesMap[price.symbol] = {
             price: price.price,
             change: price.change,
