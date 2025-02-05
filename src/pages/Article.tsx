@@ -8,7 +8,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import ReactMarkdown from 'react-markdown';
 import { TextEditor } from "@/components/TextEditor";
 
 const Article = () => {
@@ -167,6 +166,15 @@ const Article = () => {
     }
   };
 
+  // Function to convert markdown to HTML
+  const formatContent = (content: string) => {
+    // Convert markdown bold to HTML
+    content = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    // Convert markdown italic to HTML
+    content = content.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    return content;
+  };
+
   return (
     <div className="max-w-4xl mx-auto animate-fade-in">
       <div className="relative h-[400px] mb-8 rounded-xl overflow-hidden">
@@ -206,7 +214,7 @@ const Article = () => {
           ) : (
             <div 
               className="article-content"
-              dangerouslySetInnerHTML={{ __html: article.content }}
+              dangerouslySetInnerHTML={{ __html: formatContent(article.content) }}
             />
           )}
           <div className="mt-8 flex items-center gap-4">
