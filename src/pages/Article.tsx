@@ -2,6 +2,7 @@ import { useParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Share2, ArrowUp, ArrowDown, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
@@ -17,9 +18,9 @@ const Article = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState("");
   const [editedContent, setEditedContent] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [uploadLoading, setUploadLoading] = useState(false);
 
-  const { data: article, isLoading } = useQuery({
+  const { data: article, isLoading: queryLoading } = useQuery({
     queryKey: ["article", id],
     queryFn: async () => {
       const { data: article, error } = await supabase
@@ -67,7 +68,7 @@ const Article = () => {
     const filePath = `${crypto.randomUUID()}.${fileExt}`;
     
     try {
-      setIsLoading(true);
+      setUploadLoading(true);
       const { error: uploadError } = await supabase.storage
         .from('article-images')
         .upload(filePath, file);
@@ -85,7 +86,7 @@ const Article = () => {
     } catch (error: any) {
       toast.error("Failed to upload image: " + error.message);
     } finally {
-      setIsLoading(false);
+      setUploadLoading(false);
     }
   };
 
@@ -127,7 +128,7 @@ const Article = () => {
     return () => clearInterval(interval);
   }, [article]);
 
-  if (isLoading) {
+  if (queryLoading) {
     return <div>Loading...</div>;
   }
 
@@ -175,7 +176,7 @@ const Article = () => {
               content={editedContent}
               onChange={setEditedContent}
               onImageUpload={handleInlineImageUpload}
-              isLoading={isLoading}
+              isLoading={uploadLoading}
             />
           ) : (
             <ReactMarkdown 
