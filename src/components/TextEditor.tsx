@@ -20,7 +20,6 @@ interface TextEditorProps {
 export const TextEditor = ({ content, onChange, onImageUpload, isLoading }: TextEditorProps) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
-  const previewRef = useRef<HTMLDivElement>(null);
 
   const insertFormat = (format: string) => {
     const textarea = textareaRef.current;
@@ -33,10 +32,10 @@ export const TextEditor = ({ content, onChange, onImageUpload, isLoading }: Text
     let formattedText = '';
     switch (format) {
       case 'bold':
-        formattedText = `<strong>${selectedText}</strong>`;
+        formattedText = `**${selectedText}**`;
         break;
       case 'italic':
-        formattedText = `<em>${selectedText}</em>`;
+        formattedText = `*${selectedText}*`;
         break;
       default:
         return;
@@ -48,7 +47,7 @@ export const TextEditor = ({ content, onChange, onImageUpload, isLoading }: Text
     // Reset selection
     setTimeout(() => {
       textarea.focus();
-      textarea.setSelectionRange(start, end + formattedText.length - selectedText.length);
+      textarea.setSelectionRange(start, end + 4);
     }, 0);
   };
 
@@ -127,19 +126,12 @@ export const TextEditor = ({ content, onChange, onImageUpload, isLoading }: Text
           <ImageIcon className="h-4 w-4" />
         </Button>
       </div>
-      <div className="relative">
-        <textarea
-          ref={textareaRef}
-          value={content}
-          onChange={(e) => onChange(e.target.value)}
-          className="w-full min-h-[400px] p-4 rounded-lg border bg-background resize-y font-mono"
-        />
-        <div
-          ref={previewRef}
-          className="absolute inset-0 pointer-events-none p-4 article-content"
-          dangerouslySetInnerHTML={{ __html: content }}
-        />
-      </div>
+      <textarea
+        ref={textareaRef}
+        value={content}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full min-h-[400px] p-4 rounded-lg border bg-background resize-y"
+      />
       <input
         ref={imageInputRef}
         type="file"
