@@ -11,6 +11,7 @@ import NotFound from "./pages/NotFound";
 import Layout from "./components/Layout";
 import Auth from "./pages/Auth";
 import CreateArticle from "./pages/CreateArticle";
+import BrowseArticles from "./pages/BrowseArticles";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ const App = () => (
               <Route path="/stocks" element={<StockPrices />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/create-article" element={<CreateArticle />} />
+              <Route path="/browse" element={<BrowseArticles />} />
               <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>
