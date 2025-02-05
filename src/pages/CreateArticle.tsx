@@ -3,11 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Navigate } from "react-router-dom";
-import { Plus, X, Image as ImageIcon } from "lucide-react";
+import { Plus, X } from "lucide-react";
+import { TextEditor } from "@/components/TextEditor";
 
 export default function CreateArticle() {
   const [title, setTitle] = useState("");
@@ -16,8 +16,6 @@ export default function CreateArticle() {
   const [isLoading, setIsLoading] = useState(false);
   const [relatedStocks, setRelatedStocks] = useState<string[]>([]);
   const [newStock, setNewStock] = useState("");
-  const contentRef = useRef<HTMLTextAreaElement>(null);
-  const inlineImageInputRef = useRef<HTMLInputElement>(null);
   const heroImageInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const { user, isAdmin } = useAuth();
@@ -51,21 +49,8 @@ export default function CreateArticle() {
         .from('article-images')
         .getPublicUrl(filePath);
 
-      // Insert image URL at cursor position
-      const textarea = contentRef.current;
-      if (textarea) {
-        const cursorPosition = textarea.selectionStart;
-        const textBefore = content.substring(0, cursorPosition);
-        const textAfter = content.substring(cursorPosition);
-        const imageMarkdown = `\n![${file.name}](${publicUrl})\n`;
-        
-        setContent(textBefore + imageMarkdown + textAfter);
-        
-        // Reset file input
-        if (inlineImageInputRef.current) {
-          inlineImageInputRef.current.value = '';
-        }
-      }
+      const imageMarkdown = `\n![${file.name}](${publicUrl})\n`;
+      setContent(prev => prev + imageMarkdown);
 
       toast.success("Image uploaded successfully!");
     } catch (error: any) {
@@ -161,33 +146,12 @@ export default function CreateArticle() {
         </div>
         <div>
           <label className="block text-sm font-medium mb-2">Content</label>
-          <div className="relative">
-            <Textarea
-              ref={contentRef}
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              required
-              placeholder="Write your article content"
-              className="min-h-[200px]"
-            />
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              className="absolute right-2 bottom-2"
-              onClick={() => inlineImageInputRef.current?.click()}
-              disabled={isLoading}
-            >
-              <ImageIcon className="h-4 w-4" />
-            </Button>
-            <input
-              ref={inlineImageInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleInlineImageUpload}
-              className="hidden"
-            />
-          </div>
+          <TextEditor
+            content={content}
+            onChange={setContent}
+            onImageUpload={handleInlineImageUpload}
+            isLoading={isLoading}
+          />
         </div>
         <div>
           <label className="block text-sm font-medium mb-2">Hero Image</label>

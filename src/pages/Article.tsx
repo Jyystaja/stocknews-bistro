@@ -188,6 +188,18 @@ const Article = () => {
                     loading="lazy"
                   />
                 ),
+                p: ({ node, ...props }) => (
+                  <p {...props} className="my-4" />
+                ),
+                strong: ({ node, ...props }) => (
+                  <strong {...props} className="font-bold" />
+                ),
+                em: ({ node, ...props }) => (
+                  <em {...props} className="italic" />
+                ),
+                span: ({ node, ...props }) => (
+                  <span {...props} />
+                ),
               }}
             >
               {article.content}
