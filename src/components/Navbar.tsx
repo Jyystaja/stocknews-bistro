@@ -1,7 +1,7 @@
-
 import { Link } from "react-router-dom";
-import { GraduationCap } from "lucide-react";
+import { GraduationCap, Plus, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,6 +10,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const Navbar = () => {
+  const { user, signOut, isAdmin } = useAuth();
+
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
@@ -25,6 +27,13 @@ const Navbar = () => {
               <Link to="/stocks" className="text-sm font-medium transition-colors hover:text-primary">
                 Stock Prices
               </Link>
+              {isAdmin && (
+                <Link to="/create-article">
+                  <Button variant="ghost" size="icon">
+                    <Plus className="h-5 w-5" />
+                  </Button>
+                </Link>
+              )}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon">
@@ -37,6 +46,15 @@ const Navbar = () => {
                   <DropdownMenuItem>Trading Strategies</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+              {user ? (
+                <Button variant="ghost" size="icon" onClick={() => signOut()}>
+                  <LogOut className="h-5 w-5" />
+                </Button>
+              ) : (
+                <Link to="/auth">
+                  <Button>Sign In</Button>
+                </Link>
+              )}
             </nav>
           </div>
         </div>
