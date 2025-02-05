@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Share2, ArrowUp, ArrowDown, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,18 +7,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
 import ReactMarkdown from 'react-markdown';
+import { TextEditor } from "@/components/TextEditor";
 
 const Article = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
   const { user } = useAuth();
   const [stockPrices, setStockPrices] = useState<Record<string, { price: string; change: string }>>({});
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState("");
   const [editedContent, setEditedContent] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const { data: article, isLoading } = useQuery({
     queryKey: ["article", id],
@@ -59,6 +58,36 @@ const Article = () => {
       toast.error("Failed to update article: " + error.message);
     },
   });
+
+  const handleInlineImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || !e.target.files[0]) return;
+    
+    const file = e.target.files[0];
+    const fileExt = file.name.split('.').pop();
+    const filePath = `${crypto.randomUUID()}.${fileExt}`;
+    
+    try {
+      setIsLoading(true);
+      const { error: uploadError } = await supabase.storage
+        .from('article-images')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('article-images')
+        .getPublicUrl(filePath);
+
+      const imageMarkdown = `\n![${file.name}](${publicUrl})\n`;
+      setEditedContent(prev => prev + imageMarkdown);
+
+      toast.success("Image uploaded successfully!");
+    } catch (error: any) {
+      toast.error("Failed to upload image: " + error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (article) {
@@ -142,10 +171,11 @@ const Article = () => {
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8">
         <div className="prose prose-lg max-w-none dark:prose-invert">
           {isEditing ? (
-            <Textarea
-              value={editedContent}
-              onChange={(e) => setEditedContent(e.target.value)}
-              className="min-h-[400px]"
+            <TextEditor
+              content={editedContent}
+              onChange={setEditedContent}
+              onImageUpload={handleInlineImageUpload}
+              isLoading={isLoading}
             />
           ) : (
             <ReactMarkdown 
