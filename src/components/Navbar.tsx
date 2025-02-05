@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { GraduationCap, Plus, Menu } from "lucide-react";
+import { GraduationCap, Plus, Menu, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const NavItems = () => {
-  const { isAdmin } = useAuth();
+  const { isAdmin, signOut } = useAuth();
   
   return (
     <>
@@ -51,6 +51,39 @@ const NavItems = () => {
   );
 };
 
+const MobileNav = () => {
+  const { isAdmin, signOut } = useAuth();
+  
+  return (
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button variant="ghost" size="icon" className="ml-auto">
+          <Menu className="h-5 w-5" />
+        </Button>
+      </SheetTrigger>
+      <SheetContent side="right" className="w-[240px] sm:w-[280px]">
+        <nav className="flex flex-col h-full">
+          <div className="flex flex-col space-y-4 mt-8 flex-grow">
+            <NavItems />
+          </div>
+          {isAdmin && (
+            <div className="pb-6">
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start" 
+                onClick={signOut}
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
+              </Button>
+            </div>
+          )}
+        </nav>
+      </SheetContent>
+    </Sheet>
+  );
+};
+
 const Navbar = () => {
   const isMobile = useIsMobile();
 
@@ -65,18 +98,7 @@ const Navbar = () => {
             {isMobile ? (
               <div className="flex w-full justify-between items-center">
                 <div className="flex-1" />
-                <Sheet>
-                  <SheetTrigger asChild>
-                    <Button variant="ghost" size="icon" className="ml-auto">
-                      <Menu className="h-5 w-5" />
-                    </Button>
-                  </SheetTrigger>
-                  <SheetContent side="right" className="w-[240px] sm:w-[280px]">
-                    <nav className="flex flex-col space-y-4 mt-8">
-                      <NavItems />
-                    </nav>
-                  </SheetContent>
-                </Sheet>
+                <MobileNav />
               </div>
             ) : (
               <nav className="flex items-center space-x-6">
