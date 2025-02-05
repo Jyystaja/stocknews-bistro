@@ -26,25 +26,27 @@ const NavItems = () => {
       <Link to="/stocks" className="text-sm font-medium transition-colors hover:text-primary">
         Stock Prices
       </Link>
-      {isAdmin && (
-        <Link to="/create-article">
-          <Button variant="ghost" size="icon">
-            <Plus className="h-5 w-5" />
-          </Button>
-        </Link>
-      )}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon">
-            <GraduationCap className="h-5 w-5" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-[200px]">
-          <DropdownMenuItem>Market Basics</DropdownMenuItem>
-          <DropdownMenuItem>Technical Analysis</DropdownMenuItem>
-          <DropdownMenuItem>Trading Strategies</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <div className="flex items-center space-x-2 ml-auto">
+        {isAdmin && (
+          <Link to="/create-article">
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <Plus className="h-5 w-5" />
+            </Button>
+          </Link>
+        )}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <GraduationCap className="h-5 w-5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-[200px]">
+            <DropdownMenuItem>Market Basics</DropdownMenuItem>
+            <DropdownMenuItem>Technical Analysis</DropdownMenuItem>
+            <DropdownMenuItem>Trading Strategies</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </>
   );
 };
@@ -61,18 +63,21 @@ const Navbar = () => {
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
           <div className="w-full flex-1 md:w-auto md:flex-none">
             {isMobile ? (
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <Menu className="h-5 w-5" />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="left" className="w-[240px] sm:w-[280px]">
-                  <nav className="flex flex-col space-y-4 mt-8">
-                    <NavItems />
-                  </nav>
-                </SheetContent>
-              </Sheet>
+              <div className="flex w-full justify-between items-center">
+                <div className="flex-1" />
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button variant="ghost" size="icon" className="ml-auto">
+                      <Menu className="h-5 w-5" />
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="right" className="w-[240px] sm:w-[280px]">
+                    <nav className="flex flex-col space-y-4 mt-8">
+                      <NavItems />
+                    </nav>
+                  </SheetContent>
+                </Sheet>
+              </div>
             ) : (
               <nav className="flex items-center space-x-6">
                 <NavItems />
