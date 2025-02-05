@@ -65,11 +65,18 @@ export const TextEditor = ({ content, onChange, onImageUpload, isLoading }: Text
   };
 
   const handleColor = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Only apply color when the input event is completed (user has selected a color)
+    if (e.type !== 'change') return;
+    
     const textarea = textareaRef.current;
     if (!textarea) return;
 
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
+    
+    // Only apply color if there's selected text
+    if (start === end) return;
+    
     const selectedText = content.substring(start, end);
     const formattedText = `<span style="color: ${e.target.value}">${selectedText}</span>`;
 
