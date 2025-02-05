@@ -1,6 +1,6 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Share2, ArrowUp, ArrowDown, Edit } from "lucide-react";
+import { Share2, ArrowUp, ArrowDown, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -13,6 +13,7 @@ import { TextEditor } from "@/components/TextEditor";
 
 const Article = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [stockPrices, setStockPrices] = useState<Record<string, { price: string; change: string }>>({});
   const [isEditing, setIsEditing] = useState(false);
@@ -57,6 +58,24 @@ const Article = () => {
     },
     onError: (error) => {
       toast.error("Failed to update article: " + error.message);
+    },
+  });
+
+  const deleteArticleMutation = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from("articles")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Article deleted successfully!");
+      navigate("/");
+    },
+    onError: (error) => {
+      toast.error("Failed to delete article: " + error.message);
     },
   });
 
@@ -142,6 +161,12 @@ const Article = () => {
     updateArticleMutation.mutate();
   };
 
+  const handleDelete = () => {
+    if (window.confirm("Are you sure you want to delete this article?")) {
+      deleteArticleMutation.mutate();
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto animate-fade-in">
       <div className="relative h-[400px] mb-8 rounded-xl overflow-hidden">
@@ -179,31 +204,10 @@ const Article = () => {
               isLoading={uploadLoading}
             />
           ) : (
-            <ReactMarkdown 
-              components={{
-                img: ({ node, ...props }) => (
-                  <img 
-                    {...props} 
-                    className="w-full rounded-lg my-4"
-                    loading="lazy"
-                  />
-                ),
-                p: ({ node, ...props }) => (
-                  <p {...props} className="my-4" />
-                ),
-                strong: ({ node, ...props }) => (
-                  <strong {...props} className="font-bold" />
-                ),
-                em: ({ node, ...props }) => (
-                  <em {...props} className="italic" />
-                ),
-                span: ({ node, ...props }) => (
-                  <span {...props} />
-                ),
-              }}
-            >
-              {article.content}
-            </ReactMarkdown>
+            <div 
+              className="article-content"
+              dangerouslySetInnerHTML={{ __html: article.content }}
+            />
           )}
           <div className="mt-8 flex items-center gap-4">
             {canEdit && (
@@ -213,10 +217,16 @@ const Article = () => {
                   <Button variant="outline" onClick={() => setIsEditing(false)}>Cancel</Button>
                 </>
               ) : (
-                <Button variant="outline" onClick={() => setIsEditing(true)}>
-                  <Edit className="h-4 w-4 mr-2" />
-                  Edit
-                </Button>
+                <>
+                  <Button variant="outline" onClick={() => setIsEditing(true)}>
+                    <Edit className="h-4 w-4 mr-2" />
+                    Edit
+                  </Button>
+                  <Button variant="destructive" onClick={handleDelete}>
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete
+                  </Button>
+                </>
               )
             )}
             <Button variant="outline" size="sm">
