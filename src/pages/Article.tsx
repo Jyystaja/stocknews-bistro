@@ -31,22 +31,42 @@ const Article = () => {
 
   useEffect(() => {
     const fetchStockPrices = async () => {
-      if (!article?.article_stocks) return;
+      if (!article?.article_stocks?.length) return;
 
-      // In a real app, you would use the TradingView API here
-      // For now, we'll simulate real-time data
-      const mockPrices: Record<string, { price: string; change: string }> = {};
-      article.article_stocks.forEach((stock: { symbol: string }) => {
-        mockPrices[stock.symbol] = {
-          price: (Math.random() * 1000).toFixed(2),
-          change: (Math.random() * 10 - 5).toFixed(2),
-        };
-      });
-      setStockPrices(mockPrices);
+      try {
+        const symbols = article.article_stocks.map((stock: { symbol: string }) => stock.symbol);
+        const response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-stock-prices`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+            },
+            body: JSON.stringify({ symbols }),
+          }
+        );
+
+        if (!response.ok) throw new Error('Failed to fetch stock prices');
+
+        const prices = await response.json();
+        const pricesMap: Record<string, { price: string; change: string }> = {};
+        
+        prices.forEach((price: { symbol: string; price: string; change: string }) => {
+          pricesMap[price.symbol] = {
+            price: price.price,
+            change: price.change,
+          };
+        });
+
+        setStockPrices(pricesMap);
+      } catch (error) {
+        console.error('Error fetching stock prices:', error);
+      }
     };
 
     fetchStockPrices();
-    const interval = setInterval(fetchStockPrices, 5000);
+    const interval = setInterval(fetchStockPrices, 60000); // Update every minute
     return () => clearInterval(interval);
   }, [article]);
 
@@ -110,12 +130,12 @@ const Article = () => {
                     </div>
                     <div
                       className={
-                        (stockPrices[stock.symbol]?.change.startsWith("-")
+                        (parseFloat(stockPrices[stock.symbol]?.change || "0") < 0
                           ? "text-stock-down"
                           : "text-stock-up") + " flex flex-col items-end"
                       }
                     >
-                      {stockPrices[stock.symbol]?.change.startsWith("-") ? (
+                      {parseFloat(stockPrices[stock.symbol]?.change || "0") < 0 ? (
                         <ArrowDown className="h-4 w-4" />
                       ) : (
                         <ArrowUp className="h-4 w-4" />
