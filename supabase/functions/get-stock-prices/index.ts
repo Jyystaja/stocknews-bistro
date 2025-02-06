@@ -28,26 +28,33 @@ serve(async (req) => {
           const timestamps = data.chart.result[0].timestamp
           const prices = data.chart.result[0].indicators.quote[0].close
 
-          // Get the last two valid prices
+          // Get the last price and the price from 5 days ago
           let currentPrice = null
           let previousPrice = null
+          let fiveDayPrice = null
           
           for (let i = prices.length - 1; i >= 0; i--) {
             if (currentPrice === null && prices[i] !== null) {
               currentPrice = prices[i]
             } else if (previousPrice === null && prices[i] !== null) {
               previousPrice = prices[i]
-              break
+            }
+            
+            // Get the first valid price (oldest) for 5-day calculation
+            if (i === 0 && prices[i] !== null) {
+              fiveDayPrice = prices[i]
             }
           }
 
-          if (currentPrice && previousPrice) {
-            const priceChange = ((currentPrice - previousPrice) / previousPrice) * 100
+          if (currentPrice && previousPrice && fiveDayPrice) {
+            const oneDayChange = ((currentPrice - previousPrice) / previousPrice) * 100
+            const fiveDayChange = ((currentPrice - fiveDayPrice) / fiveDayPrice) * 100
 
             return {
               symbol,
               price: currentPrice.toFixed(2),
-              change: priceChange.toFixed(2)
+              change: oneDayChange.toFixed(2),
+              fiveDayChange: fiveDayChange.toFixed(2)
             }
           }
         }
@@ -56,7 +63,8 @@ serve(async (req) => {
         return {
           symbol,
           price: '0.00',
-          change: '0.00'
+          change: '0.00',
+          fiveDayChange: '0.00'
         }
       })
     )

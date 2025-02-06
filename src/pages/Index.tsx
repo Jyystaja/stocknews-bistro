@@ -91,9 +91,15 @@ const StockTicker = () => {
               <p className="font-bold">{stock.symbol}</p>
               <p className="text-sm">${stock.price}</p>
             </div>
-            <div className={Number(stock.change) >= 0 ? "text-stock-up" : "text-stock-down"}>
-              {Number(stock.change) >= 0 ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
-              <span className="text-sm">{stock.change}%</span>
+            <div className="flex flex-col gap-1">
+              <div className={Number(stock.change) >= 0 ? "text-stock-up flex items-center gap-1" : "text-stock-down flex items-center gap-1"}>
+                {Number(stock.change) >= 0 ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
+                <span className="text-sm">{stock.change}% (1d)</span>
+              </div>
+              <div className={Number(stock.fiveDayChange) >= 0 ? "text-stock-up flex items-center gap-1" : "text-stock-down flex items-center gap-1"}>
+                {Number(stock.fiveDayChange) >= 0 ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
+                <span className="text-sm">{stock.fiveDayChange}% (5d)</span>
+              </div>
             </div>
           </CardContent>
         </Card>
