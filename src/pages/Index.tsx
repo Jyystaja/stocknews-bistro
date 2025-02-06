@@ -49,29 +49,58 @@ const FeaturedArticle = () => {
   );
 };
 
-const StockTicker = () => (
-  <div className="flex gap-4 py-4 overflow-x-auto scrollbar-hide">
-    {[
-      { symbol: "AAPL", price: "182.52", change: "+1.25" },
-      { symbol: "GOOGL", price: "141.80", change: "-0.45" },
-      { symbol: "MSFT", price: "378.85", change: "+2.10" },
-      { symbol: "AMZN", price: "155.32", change: "+0.78" },
-    ].map((stock) => (
-      <Card key={stock.symbol} className="flex-shrink-0 hover-lift">
-        <CardContent className="flex items-center gap-4 p-4">
-          <div>
-            <p className="font-bold">{stock.symbol}</p>
-            <p className="text-sm">${stock.price}</p>
-          </div>
-          <div className={stock.change.startsWith("+") ? "text-stock-up" : "text-stock-down"}>
-            {stock.change.startsWith("+") ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
-            <span className="text-sm">{stock.change}%</span>
-          </div>
-        </CardContent>
-      </Card>
-    ))}
-  </div>
-);
+const StockTicker = () => {
+  const { data: stocks, isLoading } = useQuery({
+    queryKey: ["stock-prices"],
+    queryFn: async () => {
+      const symbols = ["AAPL", "GOOGL", "MSFT", "AMZN"];
+      const { data, error } = await supabase.functions.invoke('get-stock-prices', {
+        body: { symbols }
+      });
+      
+      if (error) {
+        console.error('Error fetching stock prices:', error);
+        throw error;
+      }
+      
+      return data;
+    },
+    refetchInterval: 60000, // Refresh every minute
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex gap-4 py-4 overflow-x-auto scrollbar-hide">
+        {[1, 2, 3, 4].map((i) => (
+          <Card key={i} className="flex-shrink-0 animate-pulse">
+            <CardContent className="flex items-center gap-4 p-4 w-48 h-20">
+              <div className="bg-gray-200 w-full h-full rounded"></div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex gap-4 py-4 overflow-x-auto scrollbar-hide">
+      {(stocks || []).map((stock) => (
+        <Card key={stock.symbol} className="flex-shrink-0 hover-lift">
+          <CardContent className="flex items-center gap-4 p-4">
+            <div>
+              <p className="font-bold">{stock.symbol}</p>
+              <p className="text-sm">${stock.price}</p>
+            </div>
+            <div className={Number(stock.change) >= 0 ? "text-stock-up" : "text-stock-down"}>
+              {Number(stock.change) >= 0 ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
+              <span className="text-sm">{stock.change}%</span>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+};
 
 const NewsGrid = () => {
   const { data: articles } = useQuery({
