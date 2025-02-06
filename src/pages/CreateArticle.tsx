@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Navigate } from "react-router-dom";
@@ -11,6 +12,7 @@ import { TextEditor } from "@/components/TextEditor";
 
 export default function CreateArticle() {
   const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [content, setContent] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -100,6 +102,7 @@ export default function CreateArticle() {
         .from('articles')
         .insert({
           title,
+          description,
           content,
           image_url: imageUrl,
           author_id: user.id,
@@ -142,6 +145,15 @@ export default function CreateArticle() {
             onChange={(e) => setTitle(e.target.value)}
             required
             placeholder="Enter article title"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-2">Description</label>
+          <Textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Enter a brief description of your article"
+            className="h-24"
           />
         </div>
         <div>

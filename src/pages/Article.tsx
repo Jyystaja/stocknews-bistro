@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Share2, ArrowUp, ArrowDown, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
@@ -18,6 +19,7 @@ const Article = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState("");
   const [editedContent, setEditedContent] = useState("");
+  const [editedDescription, setEditedDescription] = useState("");
   const [uploadLoading, setUploadLoading] = useState(false);
 
   const { data: article, isLoading: queryLoading } = useQuery({
@@ -46,6 +48,7 @@ const Article = () => {
         .update({
           title: editedTitle,
           content: editedContent,
+          description: editedDescription,
         })
         .eq("id", id);
 
@@ -62,6 +65,15 @@ const Article = () => {
 
   const deleteArticleMutation = useMutation({
     mutationFn: async () => {
+      // First delete related stocks
+      const { error: stocksError } = await supabase
+        .from("article_stocks")
+        .delete()
+        .eq("article_id", id);
+
+      if (stocksError) throw stocksError;
+
+      // Then delete the article
       const { error } = await supabase
         .from("articles")
         .delete()
@@ -71,7 +83,7 @@ const Article = () => {
     },
     onSuccess: () => {
       toast.success("Article deleted successfully!");
-      navigate("/");
+      navigate("/browse");
     },
     onError: (error) => {
       toast.error("Failed to delete article: " + error.message);
@@ -112,6 +124,7 @@ const Article = () => {
     if (article) {
       setEditedTitle(article.title);
       setEditedContent(article.content);
+      setEditedDescription(article.description || "");
     }
   }, [article]);
 
@@ -188,13 +201,26 @@ const Article = () => {
         )}
         <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
           {isEditing ? (
-            <Input
-              value={editedTitle}
-              onChange={(e) => setEditedTitle(e.target.value)}
-              className="text-4xl font-bold mb-4 bg-white/10 border-white/20"
-            />
+            <>
+              <Input
+                value={editedTitle}
+                onChange={(e) => setEditedTitle(e.target.value)}
+                className="text-4xl font-bold mb-4 bg-white/10 border-white/20"
+              />
+              <Textarea
+                value={editedDescription}
+                onChange={(e) => setEditedDescription(e.target.value)}
+                className="bg-white/10 border-white/20"
+                placeholder="Enter article description"
+              />
+            </>
           ) : (
-            <h1 className="text-4xl font-bold mb-4">{article.title}</h1>
+            <>
+              <h1 className="text-4xl font-bold mb-4">{article.title}</h1>
+              {article.description && (
+                <p className="text-lg opacity-90 mb-4">{article.description}</p>
+              )}
+            </>
           )}
           <div className="flex items-center gap-4">
             <span>{new Date(article.created_at).toLocaleDateString()}</span>
