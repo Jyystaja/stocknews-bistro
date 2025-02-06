@@ -94,7 +94,7 @@ const Navbar = () => {
           <img 
             src="/lovable-uploads/01315658-6014-493e-9182-a9c06b307f24.png" 
             alt="STNX Logo" 
-            className="h-8 w-auto"
+            className="h-8 w-auto opacity-90 hover:opacity-100 transition-opacity"
           />
         </Link>
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
