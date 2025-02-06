@@ -92,7 +92,7 @@ const Navbar = () => {
       <div className="container flex h-16 items-center">
         <Link to="/" className="mr-8 flex items-center space-x-2">
           <img 
-            src="/lovable-uploads/01315658-6014-493e-9182-a9c06b307f24.png" 
+            src="/lovable-uploads/015e96c2-009b-43ae-a995-59f339ae42eb.png" 
             alt="STNX Logo" 
             className="h-8 w-auto opacity-90 hover:opacity-100 transition-opacity"
           />
