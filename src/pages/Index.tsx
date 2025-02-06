@@ -38,10 +38,10 @@ const FeaturedArticle = () => {
           className="w-full h-[400px] object-cover"
         />
         <div className="absolute bottom-0 left-0 right-0 p-6 z-20 text-white">
-          <p className="text-sm font-medium mb-2">Featured</p>
+          <p className="text-sm font-medium mb-2">Pääartikkeli</p>
           <h2 className="text-2xl font-bold mb-2">{featuredArticle.title}</h2>
           <p className="text-sm opacity-90">
-            {featuredArticle.description || "No description available"}
+            {featuredArticle.description || "Ei kuvausta saatavilla"}
           </p>
         </div>
       </Card>
@@ -100,7 +100,7 @@ const NewsGrid = () => {
             <CardHeader>
               <CardTitle className="line-clamp-2">{article.title}</CardTitle>
               <CardDescription className="line-clamp-3">
-                {article.description || "No description available"}
+                {article.description || "Ei kuvausta saatavilla"}
               </CardDescription>
             </CardHeader>
           </Card>
@@ -117,15 +117,15 @@ const Index = () => {
       <div>
         <div className="flex items-center gap-2 mb-4">
           <TrendingUp className="h-5 w-5" />
-          <h2 className="text-xl font-bold">Market Movers</h2>
+          <h2 className="text-xl font-bold">Markkinoiden liikkujat</h2>
         </div>
         <StockTicker />
       </div>
       <div>
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold">Latest News</h2>
+          <h2 className="text-xl font-bold">Viimeisimmät uutiset</h2>
           <Link to="/browse">
-            <Button variant="outline">Browse All Articles</Button>
+            <Button variant="outline">Selaa kaikkia artikkeleita</Button>
           </Link>
         </div>
         <NewsGrid />

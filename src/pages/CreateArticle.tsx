@@ -136,28 +136,28 @@ export default function CreateArticle() {
 
   return (
     <div className="max-w-4xl mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-8">Create New Article</h1>
+      <h1 className="text-3xl font-bold mb-8">Luo uusi artikkeli</h1>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label className="block text-sm font-medium mb-2">Title</label>
+          <label className="block text-sm font-medium mb-2">Otsikko</label>
           <Input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
-            placeholder="Enter article title"
+            placeholder="Syötä artikkelin otsikko"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-2">Description</label>
+          <label className="block text-sm font-medium mb-2">Kuvaus</label>
           <Textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Enter a brief description of your article"
+            placeholder="Syötä lyhyt kuvaus artikkelista"
             className="h-24"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-2">Content</label>
+          <label className="block text-sm font-medium mb-2">Sisältö</label>
           <TextEditor
             content={content}
             onChange={setContent}
@@ -166,7 +166,7 @@ export default function CreateArticle() {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-2">Hero Image</label>
+          <label className="block text-sm font-medium mb-2">Pääkuva</label>
           <Input
             type="file"
             accept="image/*"
@@ -176,12 +176,12 @@ export default function CreateArticle() {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-2">Related Stocks</label>
+          <label className="block text-sm font-medium mb-2">Liittyvät osakkeet</label>
           <div className="flex gap-2">
             <Input
               value={newStock}
               onChange={(e) => setNewStock(e.target.value.toUpperCase())}
-              placeholder="Enter stock symbol (e.g., AAPL)"
+              placeholder="Syötä osakkeen symboli (esim. AAPL)"
               className="flex-1"
             />
             <Button type="button" onClick={addStock} variant="outline">
@@ -207,7 +207,7 @@ export default function CreateArticle() {
           </div>
         </div>
         <Button type="submit" disabled={isLoading}>
-          {isLoading ? "Creating..." : "Create Article"}
+          {isLoading ? "Luodaan..." : "Luo artikkeli"}
         </Button>
       </form>
     </div>

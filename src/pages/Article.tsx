@@ -55,11 +55,11 @@ const Article = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Article updated successfully!");
+      toast.success("Artikkeli päivitettiin onnistuneesti!");
       setIsEditing(false);
     },
     onError: (error) => {
-      toast.error("Failed to update article: " + error.message);
+      toast.error("Artikkelin päivittäminen epäonnistui: " + error.message);
     },
   });
 
@@ -82,11 +82,11 @@ const Article = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Article deleted successfully!");
+      toast.success("Artikkeli poistettiin onnistuneesti!");
       navigate("/browse");
     },
     onError: (error) => {
-      toast.error("Failed to delete article: " + error.message);
+      toast.error("Artikkelin poistaminen epäonnistui: " + error.message);
     },
   });
 
@@ -112,9 +112,9 @@ const Article = () => {
       const imageMarkdown = `\n![${file.name}](${publicUrl})\n`;
       setEditedContent(prev => prev + imageMarkdown);
 
-      toast.success("Image uploaded successfully!");
+      toast.success("Kuva ladattiin onnistuneesti!");
     } catch (error: any) {
-      toast.error("Failed to upload image: " + error.message);
+      toast.error("Kuvan lataaminen epäonnistui: " + error.message);
     } finally {
       setUploadLoading(false);
     }
@@ -150,7 +150,7 @@ const Article = () => {
 
         setStockPrices(pricesMap);
       } catch (error) {
-        console.error('Error fetching stock prices:', error);
+        console.error('Virhe osakekurssien hakemisessa:', error);
       }
     };
 
@@ -160,11 +160,11 @@ const Article = () => {
   }, [article]);
 
   if (queryLoading) {
-    return <div>Loading...</div>;
+    return <div>Ladataan...</div>;
   }
 
   if (!article) {
-    return <div>Article not found</div>;
+    return <div>Artikkelia ei löytynyt</div>;
   }
 
   const canEdit = user && article.author_id === user.id;
@@ -174,7 +174,7 @@ const Article = () => {
   };
 
   const handleDelete = () => {
-    if (window.confirm("Are you sure you want to delete this article?")) {
+    if (window.confirm("Oletko varma, että haluat poistaa tämän artikkelin?")) {
       deleteArticleMutation.mutate();
     }
   };
@@ -195,7 +195,7 @@ const Article = () => {
         {article.image_url && (
           <img
             src={article.image_url}
-            alt="Article hero"
+            alt="Artikkelin pääkuva"
             className="w-full h-full object-cover"
           />
         )}
@@ -211,7 +211,7 @@ const Article = () => {
                 value={editedDescription}
                 onChange={(e) => setEditedDescription(e.target.value)}
                 className="bg-white/10 border-white/20"
-                placeholder="Enter article description"
+                placeholder="Syötä artikkelin kuvaus"
               />
             </>
           ) : (
@@ -223,7 +223,7 @@ const Article = () => {
             </>
           )}
           <div className="flex items-center gap-4">
-            <span>{new Date(article.created_at).toLocaleDateString()}</span>
+            <span>{new Date(article.created_at).toLocaleDateString('fi-FI')}</span>
           </div>
         </div>
       </div>
@@ -247,25 +247,25 @@ const Article = () => {
             {canEdit && (
               isEditing ? (
                 <>
-                  <Button onClick={handleSave}>Save</Button>
-                  <Button variant="outline" onClick={() => setIsEditing(false)}>Cancel</Button>
+                  <Button onClick={handleSave}>Tallenna</Button>
+                  <Button variant="outline" onClick={() => setIsEditing(false)}>Peruuta</Button>
                 </>
               ) : (
                 <>
                   <Button variant="outline" onClick={() => setIsEditing(true)}>
                     <Edit className="h-4 w-4 mr-2" />
-                    Edit
+                    Muokkaa
                   </Button>
                   <Button variant="destructive" onClick={handleDelete}>
                     <Trash2 className="h-4 w-4 mr-2" />
-                    Delete
+                    Poista
                   </Button>
                 </>
               )
             )}
             <Button variant="outline" size="sm">
               <Share2 className="h-4 w-4 mr-2" />
-              Share
+              Jaa
             </Button>
           </div>
         </div>
@@ -273,7 +273,7 @@ const Article = () => {
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Related Stocks</CardTitle>
+              <CardTitle>Liittyvät osakkeet</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -285,7 +285,7 @@ const Article = () => {
                     <div>
                       <p className="font-bold">{stock.symbol}</p>
                       <p className="text-sm">
-                        ${stockPrices[stock.symbol]?.price || "Loading..."}
+                        ${stockPrices[stock.symbol]?.price || "Ladataan..."}
                       </p>
                     </div>
                     <div

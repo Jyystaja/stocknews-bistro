@@ -1,4 +1,3 @@
-
 import { BookOpen, GraduationCap, Info } from "lucide-react";
 import {
   Sheet,
@@ -23,31 +22,31 @@ const LearningMenu = () => {
       </SheetTrigger>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Learning Center</SheetTitle>
+          <SheetTitle>Oppimiskeskus</SheetTitle>
           <SheetDescription>
-            Enhance your trading knowledge with our curated resources.
+            Paranna kaupankäyntitietojasi kurateoiduilla resursseilla.
           </SheetDescription>
         </SheetHeader>
         <div className="mt-6 space-y-4">
           <div className="flex items-center space-x-4 p-4 hover:bg-accent rounded-lg cursor-pointer">
             <BookOpen className="h-6 w-6" />
             <div>
-              <h3 className="font-medium">Market Basics</h3>
-              <p className="text-sm text-muted-foreground">Learn the fundamentals of stock trading</p>
+              <h3 className="font-medium">Markkinoiden perusteet</h3>
+              <p className="text-sm text-muted-foreground">Opi osakekaupan perusteet</p>
             </div>
           </div>
           <div className="flex items-center space-x-4 p-4 hover:bg-accent rounded-lg cursor-pointer">
             <Info className="h-6 w-6" />
             <div>
-              <h3 className="font-medium">Technical Analysis</h3>
-              <p className="text-sm text-muted-foreground">Master chart patterns and indicators</p>
+              <h3 className="font-medium">Tekninen analyysi</h3>
+              <p className="text-sm text-muted-foreground">Hallitse kuvioanalyysi ja indikaattorit</p>
             </div>
           </div>
           <div className="flex items-center space-x-4 p-4 hover:bg-accent rounded-lg cursor-pointer">
             <GraduationCap className="h-6 w-6" />
             <div>
-              <h3 className="font-medium">Trading Strategies</h3>
-              <p className="text-sm text-muted-foreground">Advanced trading techniques and tips</p>
+              <h3 className="font-medium">Kaupankäyntistrategiat</h3>
+              <p className="text-sm text-muted-foreground">Edistyneet kaupankäyntitekniikat ja vinkit</p>
             </div>
           </div>
         </div>

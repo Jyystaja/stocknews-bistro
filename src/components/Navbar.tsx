@@ -21,10 +21,10 @@ const NavItems = () => {
   return (
     <>
       <Link to="/" className="text-sm font-medium transition-colors hover:text-primary">
-        News
+        Uutiset
       </Link>
       <Link to="/stocks" className="text-sm font-medium transition-colors hover:text-primary">
-        Stock Prices
+        Osakekurssit
       </Link>
       <div className="flex items-center space-x-2 ml-auto">
         {isAdmin && (
@@ -41,9 +41,9 @@ const NavItems = () => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-[200px]">
-            <DropdownMenuItem>Market Basics</DropdownMenuItem>
-            <DropdownMenuItem>Technical Analysis</DropdownMenuItem>
-            <DropdownMenuItem>Trading Strategies</DropdownMenuItem>
+            <DropdownMenuItem>Markkinoiden perusteet</DropdownMenuItem>
+            <DropdownMenuItem>Tekninen analyysi</DropdownMenuItem>
+            <DropdownMenuItem>Kaupankäyntistrategiat</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -74,7 +74,7 @@ const MobileNav = () => {
                 onClick={signOut}
               >
                 <LogOut className="mr-2 h-4 w-4" />
-                Logout
+                Kirjaudu ulos
               </Button>
             </div>
           )}
@@ -91,7 +91,7 @@ const Navbar = () => {
     <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
         <Link to="/" className="mr-8 flex items-center space-x-2">
-          <span className="text-xl font-bold">StockNews</span>
+          <span className="text-xl font-bold">OsakeUutiset</span>
         </Link>
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
           <div className="w-full flex-1 md:w-auto md:flex-none">
