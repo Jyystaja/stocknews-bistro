@@ -17,37 +17,46 @@ serve(async (req) => {
 
     const results = await Promise.all(
       symbols.map(async (symbol: string) => {
-        const url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${symbol}&apikey=WFK7FLVUGCI8H4EI`
+        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=5d`
         const response = await fetch(url)
         const data = await response.json()
 
         console.log(`Raw data for ${symbol}:`, data)
 
-        if (data['Time Series (Daily)']) {
-          // Get the latest date (first key in the time series)
-          const latestDate = Object.keys(data['Time Series (Daily)'])[0]
-          const latestData = data['Time Series (Daily)'][latestDate]
+        if (data.chart?.result?.[0]) {
+          const quote = data.chart.result[0].meta
+          const timestamps = data.chart.result[0].timestamp
+          const prices = data.chart.result[0].indicators.quote[0].close
+
+          // Get the last two valid prices
+          let currentPrice = null
+          let previousPrice = null
           
-          // Get previous date for calculating change
-          const previousDate = Object.keys(data['Time Series (Daily)'])[1]
-          const previousData = data['Time Series (Daily)'][previousDate]
-
-          const currentPrice = parseFloat(latestData['4. close'])
-          const previousPrice = parseFloat(previousData['4. close'])
-          const priceChange = ((currentPrice - previousPrice) / previousPrice) * 100
-
-          return {
-            symbol,
-            price: currentPrice.toFixed(2),
-            change: priceChange.toFixed(2)
+          for (let i = prices.length - 1; i >= 0; i--) {
+            if (currentPrice === null && prices[i] !== null) {
+              currentPrice = prices[i]
+            } else if (previousPrice === null && prices[i] !== null) {
+              previousPrice = prices[i]
+              break
+            }
           }
-        } else {
-          console.error(`No data found for symbol ${symbol}`)
-          return {
-            symbol,
-            price: '0.00',
-            change: '0.00'
+
+          if (currentPrice && previousPrice) {
+            const priceChange = ((currentPrice - previousPrice) / previousPrice) * 100
+
+            return {
+              symbol,
+              price: currentPrice.toFixed(2),
+              change: priceChange.toFixed(2)
+            }
           }
+        }
+
+        console.error(`No valid data found for symbol ${symbol}`)
+        return {
+          symbol,
+          price: '0.00',
+          change: '0.00'
         }
       })
     )
