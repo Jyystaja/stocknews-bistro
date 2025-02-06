@@ -37,7 +37,7 @@ const BrowseArticles = () => {
               <CardHeader>
                 <CardTitle className="line-clamp-2">{article.title}</CardTitle>
                 <CardDescription className="line-clamp-3">
-                  {article.description || article.content}
+                  {article.description || "No description available"}
                 </CardDescription>
               </CardHeader>
             </Card>

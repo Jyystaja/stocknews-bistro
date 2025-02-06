@@ -40,7 +40,9 @@ const FeaturedArticle = () => {
         <div className="absolute bottom-0 left-0 right-0 p-6 z-20 text-white">
           <p className="text-sm font-medium mb-2">Featured</p>
           <h2 className="text-2xl font-bold mb-2">{featuredArticle.title}</h2>
-          <p className="text-sm opacity-90">{featuredArticle.content.substring(0, 120)}...</p>
+          <p className="text-sm opacity-90">
+            {featuredArticle.description || "No description available"}
+          </p>
         </div>
       </Card>
     </Link>
@@ -98,7 +100,7 @@ const NewsGrid = () => {
             <CardHeader>
               <CardTitle className="line-clamp-2">{article.title}</CardTitle>
               <CardDescription className="line-clamp-3">
-                {article.content}
+                {article.description || "No description available"}
               </CardDescription>
             </CardHeader>
           </Card>
