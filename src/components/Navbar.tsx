@@ -89,12 +89,12 @@ const Navbar = () => {
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-32 items-center">
+      <div className="container flex h-16 items-center">
         <Link to="/" className="mr-8 flex items-center space-x-2">
           <img 
-            src="/lovable-uploads/015e96c2-009b-43ae-a995-59f339ae42eb.png" 
+            src="/lovable-uploads/01315658-6014-493e-9182-a9c06b307f24.png" 
             alt="STNX Logo" 
-            className="h-24 w-auto"
+            className="h-8 w-auto"
           />
         </Link>
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
