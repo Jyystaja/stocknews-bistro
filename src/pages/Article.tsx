@@ -65,7 +65,6 @@ const Article = () => {
 
   const deleteArticleMutation = useMutation({
     mutationFn: async () => {
-      // First delete related stocks
       const { error: stocksError } = await supabase
         .from("article_stocks")
         .delete()
@@ -73,7 +72,6 @@ const Article = () => {
 
       if (stocksError) throw stocksError;
 
-      // Then delete the article
       const { error } = await supabase
         .from("articles")
         .delete()
@@ -179,12 +177,14 @@ const Article = () => {
     }
   };
 
-  // Function to convert markdown to HTML
+  // Function to convert markdown to HTML and preserve line breaks
   const formatContent = (content: string) => {
     // Convert markdown bold to HTML
     content = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     // Convert markdown italic to HTML
     content = content.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    // Convert line breaks to <br /> tags
+    content = content.replace(/\n/g, '<br />');
     return content;
   };
 
@@ -239,7 +239,7 @@ const Article = () => {
             />
           ) : (
             <div 
-              className="article-content"
+              className="article-content whitespace-pre-line"
               dangerouslySetInnerHTML={{ __html: formatContent(article.content) }}
             />
           )}
